@@ -1,0 +1,20 @@
+language: shell
+os:
+- linux
+- osx
+dist: bionic
+env:
+  global:
+  - CACHIX_CACHE: nix-travis-ci
+  - secure: E82aG/MEZV3cPsBKZSPcsmkJwF2OG4PINffgELClwUN8voPpZ61FuxyR9stnhx7FOPWgb9/1n1m9DwxxbvDKjJSCHUqy68x4nPov/MGQo5npLbOdD3uCvdrjfnGu3ZSAgbIdJWq6GbNg9LN+QhhZW1w/BAsO6G52f12Dl0YYO9YnbffB8X06Xv/ZEHYR2y9QTTAjCxi8QwfdKOLXUoc7CdYLRpbQowRgxgOL8e2p9lHyck9g8v6WgAIsocwl5IjRdDCbN5r0pwmZGBQgfdjWeW+hbLmW7bsTL098cL/uZk4pO9iZk30O5xCA+wLARWTczhcg6f0/tWX11ITDGbQT85p0sKDZ7PEGJcjsn5DxqR99pFzHFk/yK1Gy3BKWr65dz8M2gLs+G5Z01S4KaukbxRLC1nnrxEYyfVFqW+yeQWDSb8DAhU+NfhzaFMc8EaWxPXvmTDkt3X0Pza/gVarx7GlYVk016DVuESsIxVkGcyD45nZ+zJ5FyWxqlfLWd6u/6I5S4rCykRws91u/PhocI+AHyW93BeibaZlCPV/aRG88BJfiYtiYXfl/LqGI/prX4vLiZ38FIQLKTOkzxduXuxfdEzG7d8aVxcAgix6EMDZHrWY1wepd5JasC2bnd2Dz/CFSyOrC/oTYnZLfxOULcZKk9RKs5Xt7KmJvBf9fRxY=
+osx_image:
+- xcode10.1
+- xcode11.3
+- xcode11.6
+- xcode12
+install:
+- source install.sh
+script:
+- nix run nixpkgs.cowsay -c cowsay wooo?
+after_success:
+- comm -13 <(sort /tmp/store-path-pre-build | grep -v '\.drv$') <(nix path-info --all| grep -v '\.drv$' | sort) | cachix push $CACHIX_CACHE
