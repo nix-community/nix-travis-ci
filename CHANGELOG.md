@@ -10,6 +10,6 @@ Added a `use_nix` alias for merging with specific jobs.
 
 Initial release.
 
-[unreleased]: https://github.com/abathur/nix-travis-ci/compare/v1...HEAD
-[v2]: https://github.com/abathur/nix-travis-ci/compare/v1...v2
-[v1]: https://github.com/abathur/nix-travis-ci/releases/tag/v1
+[unreleased]: https://github.com/nix-community/nix-travis-ci/compare/v1...HEAD
+[v2]: https://github.com/nix-community/nix-travis-ci/compare/v1...v2
+[v1]: https://github.com/nix-community/nix-travis-ci/releases/tag/v1

@@ -7,14 +7,14 @@ If all of the jobs you're running use Nix, these two lines are usually enough to
 
 ```yaml
 version: ~> 1.0
-import: abathur/nix-travis-ci:nix.yml@main
+import: nix-community/nix-travis-ci:nix.yml@main
 ```
 
 If you have a job matrix with some jobs that need Nix, and others that don't, you can do something like this to install Nix just for the jobs that need it:
 
 ```yaml
 version: ~> 1.0
-import: abathur/nix-travis-ci:nix.yml@main
+import: nix-community/nix-travis-ci:nix.yml@main
 
 jobs:
   include:
@@ -40,4 +40,4 @@ My _general_ intent is for this repo and https://github.com/cachix/install-nix-a
 - Nixpkgs channel (disable with SKIP_ADDING_NIXPKGS_CHANNEL or override with NIX_PATH)
 - nix.conf (append a file specified by EXTRA_NIX_CONFIG)
 
-In addition to these common options, you can also specify a version of this repository by changing `main` in `import: abathur/nix-travis-ci:nix.yml@main` to any ref/tag/branch, such as `import: abathur/nix-travis-ci:nix.yml@v1` 
+In addition to these common options, you can also specify a version of this repository by changing `main` in `import: nix-community/nix-travis-ci:nix.yml@main` to any ref/tag/branch, such as `import: nix-community/nix-travis-ci:nix.yml@v1` 
