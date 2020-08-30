@@ -48,15 +48,42 @@ get_flags(){
   fi
 }
 
+install_log="$(mktemp)"
+
 try_install(){
-  if ! echo not a tty :o | sh /tmp/nix-install $(get_flags); then
+  if ! echo not a tty :o | sh /tmp/nix-install $(get_flags) &> $install_log; then
     # install failed, let's clean up so we can re-try
     # it'd be great if Nix wrote a contextual uninstall script to a reliable location?
     sudo mv /etc/bashrc.backup-before-nix /etc/bashrc
     sudo mv /etc/zshrc.backup-before-nix /etc/zshrc
     sudo rm -rf /etc/nix /nix /var/root/.nix-profile /var/root/.nix-defexpr /var/root/.nix-channels /Users/travis/.nix-profile /Users/travis/.nix-defexpr /Users/travis/.nix-channels
     return 1
+  else
+    # TODO: install-nix-action doesn't do this; I think that is why it echos add-path
+    # at the end. In our case, we're intentionally sourcing the script so that we can modify the environment. As far as I can tell, the ::add-path:: idiom in GH actions is a hack
+    # around not being able to change the environment? But this difference has some
+    # impact on whether the code can be shared at some point.
+    source "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
   fi
+  cat "$install_log"
+}
+
+# we're looking for a side-effect from an EOF failure. We can't just directly
+# test for the channel because the user can override setting it. The Nix installer
+# will notice something is weird here and throw a non-blocking warning message, so
+# we'll scan the output for it, and then repeatedly try the fix it suggests until
+# the heat-death of the universe (at least, in theory, this should make problems
+# with this process very squeaky...)
+fixup_channel(){
+  while read -r line; do
+    if [[ "$line" == *"But fetching the nixpkgs channel failed. (Are you offline?)"* ]]; then
+      printf "The Nix installer failed to fetch the nixpkgs channel. Let's keep trying:\n"
+      until sudo -i nix-channel --update nixpkgs; do
+        :
+      done
+      printf "OK! Successfully updated nixpkgs channel!\n"
+    fi
+  done
 }
 
 {
@@ -78,11 +105,9 @@ wget --retry-connrefused --waitretry=1 -O /tmp/nix-install "${INPUT_NIX_URL}"
 # actually rolls off...
 try_install || try_install || try_install || try_install || try_install
 
-# TODO: install-nix-action doesn't do this; I think that is why it echos add-path
-# at the end. In our case, we're intentionally sourcing the script so that we can modify the environment. As far as I can tell, the ::add-path:: idiom in GH actions is a hack
-# around not being able to change the environment? But this difference has some
-# impact on whether the code can be shared at some point.
-source "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
+# If the same issue strikes in just the right place, the install will return 0
+# but we won't have a channel...
+fixup_channel < $install_log
 
 if [[ $TRAVIS_OS_NAME = 'osx' ]]; then
   # TODO: note that below is probably only helpful pre-catalina;
@@ -94,13 +119,7 @@ if [[ $TRAVIS_OS_NAME = 'osx' ]]; then
 fi
 
 if [ -n "${CACHIX_CACHE}" ]; then
-  # this isn't actually cachix specific, but *at least for now* there's some
-  # bug that can cause nix to fail to add a channel that we don't hit until we
-  # try to use nix. (AFAIK it's the same bug requiring repeated install attempts)
-  # So, if we fail, try to make a channel until the universe ends
-  until nix-env -iA nixpkgs.cachix; do
-    sudo -i nix-channel --update nixpkgs
-  done
+  nix-env -iA nixpkgs.cachix
   cachix use $CACHIX_CACHE
   nix path-info --all > /tmp/store-path-pre-build
 fi
