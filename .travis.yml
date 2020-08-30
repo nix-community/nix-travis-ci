@@ -58,7 +58,7 @@ jobs:
     - name: add extra config to nix.conf
       os: linux
       before_install:
-        # NOTE(sublee): Do not insert blank lines. Heredoc will end at a blank line.
+        # workaround: heredoc that ends on blank line
         - |
           cat << '' > extra.conf
           sandbox = relaxed

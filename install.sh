@@ -4,7 +4,7 @@ set -eo pipefail
 
 travis_fold end install
 travis_fold start nix.install
-echo -e "\e[34;1mInstalling Nix so you can be a cool kid :]\e[0m" # labels the log fold line
+printf "\e[34;1mInstalling Nix so you can be a cool kid :]\e[0m\n" # labels the log fold line
 
 
 # Not sure how I feel about this, but for now I'll use INPUT_ just because
@@ -91,32 +91,8 @@ if [[ $TRAVIS_OS_NAME = 'osx' ]]; then
   #       once Travis CI no longer defaults macOS to 10.13
   # Disable spotlight indexing of /nix to speed up performance
   sudo mdutil -i off /nix
-
-  # macOS needs certificates hints
-  # TODO: this is in install-nix-action, but I think source nix-daemon.sh does this
-  # cert_file=/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt
-  # export NIX_SSL_CERT_FILE="$cert_file"
-  # sudo launchctl setenv NIX_SSL_CERT_FILE "$cert_file"
 fi
 
-# TODO: Check in with @domenkozar on this. I guess I could tack on support for
-#       Cachix only in the tests for this module to ensure it doesn't break.
-#       But it also seems fairly simple to support?
-#
-#       Also: I'm not certain how the config merge with travis imports affects
-#       identical keys; it might be possible to have an extra script, with an
-#       extra import (cachix.yml) if it does something smart and deterministic
-#       if they both have install and script keys?
-#
-# Cachix support (this may feel out-of-scope, but we want to avoid
-# breaking cachix--so it needs to get tested--so it needs to be in scope?)
-#
-# But, see what @domenkozar thinks. I guess this could be trimmed out and
-# only used as part of the *test* script. Note, however, that a failure in
-# `nix-env -iA nixpkgs.cachix` is being used as a heuristic to detect a case
-# where some sort of Nix + macOS 10.14+ bug is causing EOF errors, which can
-# in a rare-ish case cause the install to succeed but keep a channel from
-# getting properly updated :(
 if [ -n "${CACHIX_CACHE}" ]; then
   # this isn't actually cachix specific, but *at least for now* there's some
   # bug that can cause nix to fail to add a channel that we don't hit until we
@@ -152,5 +128,5 @@ get_nix_version_info(){
 
 travis_fold end nix.install
 travis_fold start nix.info
-echo -e "\e[34;1mNix $(get_nix_version_info) via github.com/nix-community/nix-travis-ci\e[0m"
+printf "\e[34;1mNix $(get_nix_version_info) via github.com/nix-community/nix-travis-ci\e[0m\n"
 travis_fold end nix.info
