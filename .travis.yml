@@ -26,7 +26,7 @@ jobs:
       os: linux
       env:
         - CACHIX_CACHE: nix-travis-ci
-        - secure: E82aG/MEZV3cPsBKZSPcsmkJwF2OG4PINffgELClwUN8voPpZ61FuxyR9stnhx7FOPWgb9/1n1m9DwxxbvDKjJSCHUqy68x4nPov/MGQo5npLbOdD3uCvdrjfnGu3ZSAgbIdJWq6GbNg9LN+QhhZW1w/BAsO6G52f12Dl0YYO9YnbffB8X06Xv/ZEHYR2y9QTTAjCxi8QwfdKOLXUoc7CdYLRpbQowRgxgOL8e2p9lHyck9g8v6WgAIsocwl5IjRdDCbN5r0pwmZGBQgfdjWeW+hbLmW7bsTL098cL/uZk4pO9iZk30O5xCA+wLARWTczhcg6f0/tWX11ITDGbQT85p0sKDZ7PEGJcjsn5DxqR99pFzHFk/yK1Gy3BKWr65dz8M2gLs+G5Z01S4KaukbxRLC1nnrxEYyfVFqW+yeQWDSb8DAhU+NfhzaFMc8EaWxPXvmTDkt3X0Pza/gVarx7GlYVk016DVuESsIxVkGcyD45nZ+zJ5FyWxqlfLWd6u/6I5S4rCykRws91u/PhocI+AHyW93BeibaZlCPV/aRG88BJfiYtiYXfl/LqGI/prX4vLiZ38FIQLKTOkzxduXuxfdEzG7d8aVxcAgix6EMDZHrWY1wepd5JasC2bnd2Dz/CFSyOrC/oTYnZLfxOULcZKk9RKs5Xt7KmJvBf9fRxY=
+        - secure: WczEmmAfi5H43lI3XHhygQPIb6KK8EfWgIUoqsvGboLC3GpO0myNAKPCVKymaQGvm+NcXphBgbZoN0LWAN1X7vtjWwxX2lmF3gqQqHgVvA/g3x8vZQApr4dGJ2NvdSh8agp0xceREhytHVroXOq8i3YfKlnEl4QwhiWYcOMq+OENmo8FFlNVnI6jcrB8t0QDi/JiRW2b+nZsXQtU6y/XMw/a/tvHMvlyQkYEL0gi3VYkosJxmsDwCJmaYZ2twCP5ByxQbq0zyXQoON6Uqt5GAsLKmg6X2KP/MOFQcxcezdsIzjhJC6yaQLl19FrQGDNVCXNPHOrp9iHziwmJT7tJyB5AhiGraXLm8zkWQEZTK5FR8QeSJts5fWAlj9W2QuJejHGQ2SDVBLmtoXJqjyCFWGgoKtIQ9pFdgIB3QC+4WZOdaAvZiJHYzLqfvPkMDHHkBnA/WY2XvuDVJJ6FFZhdjBzxnx81WUZgZ1zJxQiF/lCzZqPvcwRrBzP36vSFiXeTUxDhjfKJEw1OPNDemRLlvrX78excGCVbr0W1JXwpEGFfUD8dJUV0SS4kQJDid0RELMVG/LkPw+LckjfEHqd8w7ib6KGaRq7eTCCLyfmaEPNNBB9bVvSCQsuvD80MhM7OcAazKSG0qhM2Uo5teGb7qNI2gdnpdczYise5tRgpuhA=
       after_success:
         - comm -13 <(sort /tmp/store-path-pre-build | grep -v '\.drv$') <(nix path-info --all| grep -v '\.drv$' | sort) | cachix push $CACHIX_CACHE
 
