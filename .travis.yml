@@ -1,20 +1,71 @@
 language: shell
-os:
-- linux
-- osx
-dist: bionic
-env:
-  global:
-  - CACHIX_CACHE: nix-travis-ci
-  - secure: E82aG/MEZV3cPsBKZSPcsmkJwF2OG4PINffgELClwUN8voPpZ61FuxyR9stnhx7FOPWgb9/1n1m9DwxxbvDKjJSCHUqy68x4nPov/MGQo5npLbOdD3uCvdrjfnGu3ZSAgbIdJWq6GbNg9LN+QhhZW1w/BAsO6G52f12Dl0YYO9YnbffB8X06Xv/ZEHYR2y9QTTAjCxi8QwfdKOLXUoc7CdYLRpbQowRgxgOL8e2p9lHyck9g8v6WgAIsocwl5IjRdDCbN5r0pwmZGBQgfdjWeW+hbLmW7bsTL098cL/uZk4pO9iZk30O5xCA+wLARWTczhcg6f0/tWX11ITDGbQT85p0sKDZ7PEGJcjsn5DxqR99pFzHFk/yK1Gy3BKWr65dz8M2gLs+G5Z01S4KaukbxRLC1nnrxEYyfVFqW+yeQWDSb8DAhU+NfhzaFMc8EaWxPXvmTDkt3X0Pza/gVarx7GlYVk016DVuESsIxVkGcyD45nZ+zJ5FyWxqlfLWd6u/6I5S4rCykRws91u/PhocI+AHyW93BeibaZlCPV/aRG88BJfiYtiYXfl/LqGI/prX4vLiZ38FIQLKTOkzxduXuxfdEzG7d8aVxcAgix6EMDZHrWY1wepd5JasC2bnd2Dz/CFSyOrC/oTYnZLfxOULcZKk9RKs5Xt7KmJvBf9fRxY=
-osx_image:
-- xcode10.1
-- xcode11.3
-- xcode11.6
-- xcode12
-install:
-- source install.sh
-script:
-- nix run nixpkgs.cowsay -c cowsay wooo?
-after_success:
-- comm -13 <(sort /tmp/store-path-pre-build | grep -v '\.drv$') <(nix path-info --all| grep -v '\.drv$' | sort) | cachix push $CACHIX_CACHE
+install: source install.sh
+script: nix run nixpkgs.cowsay -c cowsay wooo?
+
+jobs:
+  include:
+    # test the default install across many OS/versions
+    - os: linux
+      dist: xenial
+    - os: linux
+      dist: bionic
+    - os: linux
+      dist: focal
+    - os: osx
+      osx_image: xcode10.1
+    - os: osx
+      osx_image: xcode11.3
+    - os: osx
+      osx_image: xcode11.6
+    - os: osx
+      osx_image: xcode12
+
+    # test specific features (but less broadly/specifically)
+    # going with Linux only because it's faster...
+    - name: use cachix
+      os: linux
+      env:
+        - CACHIX_CACHE: nix-travis-ci
+        - secure: E82aG/MEZV3cPsBKZSPcsmkJwF2OG4PINffgELClwUN8voPpZ61FuxyR9stnhx7FOPWgb9/1n1m9DwxxbvDKjJSCHUqy68x4nPov/MGQo5npLbOdD3uCvdrjfnGu3ZSAgbIdJWq6GbNg9LN+QhhZW1w/BAsO6G52f12Dl0YYO9YnbffB8X06Xv/ZEHYR2y9QTTAjCxi8QwfdKOLXUoc7CdYLRpbQowRgxgOL8e2p9lHyck9g8v6WgAIsocwl5IjRdDCbN5r0pwmZGBQgfdjWeW+hbLmW7bsTL098cL/uZk4pO9iZk30O5xCA+wLARWTczhcg6f0/tWX11ITDGbQT85p0sKDZ7PEGJcjsn5DxqR99pFzHFk/yK1Gy3BKWr65dz8M2gLs+G5Z01S4KaukbxRLC1nnrxEYyfVFqW+yeQWDSb8DAhU+NfhzaFMc8EaWxPXvmTDkt3X0Pza/gVarx7GlYVk016DVuESsIxVkGcyD45nZ+zJ5FyWxqlfLWd6u/6I5S4rCykRws91u/PhocI+AHyW93BeibaZlCPV/aRG88BJfiYtiYXfl/LqGI/prX4vLiZ38FIQLKTOkzxduXuxfdEzG7d8aVxcAgix6EMDZHrWY1wepd5JasC2bnd2Dz/CFSyOrC/oTYnZLfxOULcZKk9RKs5Xt7KmJvBf9fRxY=
+      after_success:
+        - comm -13 <(sort /tmp/store-path-pre-build | grep -v '\.drv$') <(nix path-info --all| grep -v '\.drv$' | sort) | cachix push $CACHIX_CACHE
+
+    - name: skip adding nixpkgs channel
+      os: linux
+      env:
+        - SKIP_ADDING_NIXPKGS_CHANNEL: true
+      script:
+        # fail w/o nixpkgs
+        - nix run nixpkgs.cowsay -c cowsay wooo? && exit 1 || echo "Failed as expected"
+        # succeed w/ nixpkgs
+        - NIX_PATH=nixpkgs=https://github.com/NixOS/nixpkgs/tarball/ab5863afada3c1b50fc43bf774b75ea71b287cde nix run nixpkgs.cowsay -c cowsay Succeeded as expected
+
+    - name: set nixpkgs channel via NIX_PATH
+      os: linux
+      env:
+        - NIX_PATH: nixpkgs=channel:nixos-20.03
+
+    - name: specify install url
+      os: linux
+      env:
+        - NIX_URL: https://releases.nixos.org/nix/nix-2.3.1/install
+      script:
+        # Once this is on it's feet, I've pondered a broader os/version matrix test
+        # (maybe in a separate branch, with a daily/weekly cron?) that can serve as
+        # a reference for which combinations both do and don't currently work.
+        - nix-env --version | grep "2.3.1"
+
+    - name: add extra config to nix.conf
+      os: linux
+      before_install:
+        # NOTE(sublee): Do not insert blank lines. Heredoc will end at a blank line.
+        - |
+          cat << '' > extra.conf
+          sandbox = relaxed
+      env:
+        - EXTRA_NIX_CONFIG: extra.conf
+      script:
+        # TODO: very basic; ideally this test should set a setting and confirm
+        # a build that requires it runs clean, and that a separate build with the
+        # option specified on the command-line fails.
+        - grep "sandbox = relaxed" /etc/nix/nix.conf

@@ -1,0 +1,3 @@
+language: shell
+install: source <(curl -Ls https://github.com/abathur/nix-travis-ci/raw/main/install.sh)
+script: nix-build
