@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [v2] - August 30, 2020
+
+Added a `use_nix` alias for merging with specific jobs.
+
 ## [v1] - August 29, 2020
 
 Initial release.

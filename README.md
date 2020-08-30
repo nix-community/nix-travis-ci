@@ -3,11 +3,23 @@ Bootstrap Nix support on Travis CI (a humble near-drop-in replacement for `langu
 
 # Quickstart
 
-These two lines add Nix support to your `.travis.yml` (they replace `language: nix` if it's already in your config):
+If all of the jobs you're running use Nix, these two lines are usually enough to add Nix support to your `.travis.yml` (they replace `language: nix` if it's already in your config):
 
 ```yaml
 version: ~> 1.0
 import: abathur/nix-travis-ci:nix.yml@main
+```
+
+If you have a job matrix with some jobs that need Nix, and others that don't, you can do something like this to install Nix just for the jobs that need it:
+
+```yaml
+version: ~> 1.0
+import: abathur/nix-travis-ci:nix.yml@main
+
+jobs:
+  include:
+    - name: build that needs nix
+      <<: *use_nix
 ```
 
 Note: the `import` key is a Travis CI beta feature called [Build Config Imports](https://docs.travis-ci.com/user/build-config-imports/) enabled by specifying `version: ~> 1.0`,  and `@main` indicates the `main` branch.
