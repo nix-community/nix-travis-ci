@@ -1,5 +1,5 @@
 # Source this script (so it can modify environment variables), i.e.:
-# source <(curl -Ls https://github.com/abathur/nix-travis-ci/raw/master/install.sh)
+# source <(curl -Ls https://github.com/nix-community/nix-travis-ci/raw/main/install.sh)
 set -eo pipefail
 
 travis_fold end install
