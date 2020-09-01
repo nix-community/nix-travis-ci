@@ -2,6 +2,10 @@ language: shell
 install: source install.sh
 script: nix run nixpkgs.cowsay -c cowsay wooo?
 
+_cachix_push: &cachix_push
+  after_success:
+    - comm -13 <(sort /tmp/store-path-pre-build | grep -v '\.drv$') <(nix path-info --all| grep -v '\.drv$' | sort) | cachix push $CACHIX_CACHE
+
 jobs:
   include:
     # test the default install across many OS/versions
@@ -27,8 +31,7 @@ jobs:
       env:
         - CACHIX_CACHE: nix-travis-ci
         - secure: WczEmmAfi5H43lI3XHhygQPIb6KK8EfWgIUoqsvGboLC3GpO0myNAKPCVKymaQGvm+NcXphBgbZoN0LWAN1X7vtjWwxX2lmF3gqQqHgVvA/g3x8vZQApr4dGJ2NvdSh8agp0xceREhytHVroXOq8i3YfKlnEl4QwhiWYcOMq+OENmo8FFlNVnI6jcrB8t0QDi/JiRW2b+nZsXQtU6y/XMw/a/tvHMvlyQkYEL0gi3VYkosJxmsDwCJmaYZ2twCP5ByxQbq0zyXQoON6Uqt5GAsLKmg6X2KP/MOFQcxcezdsIzjhJC6yaQLl19FrQGDNVCXNPHOrp9iHziwmJT7tJyB5AhiGraXLm8zkWQEZTK5FR8QeSJts5fWAlj9W2QuJejHGQ2SDVBLmtoXJqjyCFWGgoKtIQ9pFdgIB3QC+4WZOdaAvZiJHYzLqfvPkMDHHkBnA/WY2XvuDVJJ6FFZhdjBzxnx81WUZgZ1zJxQiF/lCzZqPvcwRrBzP36vSFiXeTUxDhjfKJEw1OPNDemRLlvrX78excGCVbr0W1JXwpEGFfUD8dJUV0SS4kQJDid0RELMVG/LkPw+LckjfEHqd8w7ib6KGaRq7eTCCLyfmaEPNNBB9bVvSCQsuvD80MhM7OcAazKSG0qhM2Uo5teGb7qNI2gdnpdczYise5tRgpuhA=
-      after_success:
-        - comm -13 <(sort /tmp/store-path-pre-build | grep -v '\.drv$') <(nix path-info --all| grep -v '\.drv$' | sort) | cachix push $CACHIX_CACHE
+      <<: *cachix_push
 
     - name: skip adding nixpkgs channel
       os: linux
@@ -44,6 +47,14 @@ jobs:
       os: linux
       env:
         - NIX_PATH: nixpkgs=channel:nixos-20.03
+
+    - name: use cachix with explicit channel
+      os: linux
+      env:
+        - CACHIX_CACHE: nix-travis-ci
+        - secure: WczEmmAfi5H43lI3XHhygQPIb6KK8EfWgIUoqsvGboLC3GpO0myNAKPCVKymaQGvm+NcXphBgbZoN0LWAN1X7vtjWwxX2lmF3gqQqHgVvA/g3x8vZQApr4dGJ2NvdSh8agp0xceREhytHVroXOq8i3YfKlnEl4QwhiWYcOMq+OENmo8FFlNVnI6jcrB8t0QDi/JiRW2b+nZsXQtU6y/XMw/a/tvHMvlyQkYEL0gi3VYkosJxmsDwCJmaYZ2twCP5ByxQbq0zyXQoON6Uqt5GAsLKmg6X2KP/MOFQcxcezdsIzjhJC6yaQLl19FrQGDNVCXNPHOrp9iHziwmJT7tJyB5AhiGraXLm8zkWQEZTK5FR8QeSJts5fWAlj9W2QuJejHGQ2SDVBLmtoXJqjyCFWGgoKtIQ9pFdgIB3QC+4WZOdaAvZiJHYzLqfvPkMDHHkBnA/WY2XvuDVJJ6FFZhdjBzxnx81WUZgZ1zJxQiF/lCzZqPvcwRrBzP36vSFiXeTUxDhjfKJEw1OPNDemRLlvrX78excGCVbr0W1JXwpEGFfUD8dJUV0SS4kQJDid0RELMVG/LkPw+LckjfEHqd8w7ib6KGaRq7eTCCLyfmaEPNNBB9bVvSCQsuvD80MhM7OcAazKSG0qhM2Uo5teGb7qNI2gdnpdczYise5tRgpuhA=
+        - NIX_PATH: nixpkgs=channel:nixos-20.03
+      <<: *cachix_push
 
     - name: specify install url
       os: linux
