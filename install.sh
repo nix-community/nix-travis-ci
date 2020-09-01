@@ -119,13 +119,13 @@ if [[ $TRAVIS_OS_NAME = 'osx' ]]; then
 fi
 
 if [ -n "${CACHIX_CACHE}" ]; then
-  nix-env -iA nixpkgs.cachix
-  cachix use $CACHIX_CACHE
+  nix-env -iA cachix -f https://cachix.org/api/v1/install
+  cachix use "$CACHIX_CACHE"
   nix path-info --all > /tmp/store-path-pre-build
 fi
 
 if [[ $INPUT_NIX_PATH != "" ]]; then
-  export NIX_PATH="${NIX_PATH}:${INPUT_NIX_PATH}"
+  export NIX_PATH="${INPUT_NIX_PATH}"
 fi
 
 extract_nix_version(){
