@@ -1,5 +1,6 @@
 # Source this script (so it can modify environment variables), i.e.:
 # source <(curl -Ls https://github.com/nix-community/nix-travis-ci/raw/main/install.sh)
+# shellcheck shell=bash
 set -eo pipefail
 
 travis_fold end install
@@ -22,6 +23,7 @@ INPUT_SKIP_ADDING_NIXPKGS_CHANNEL="${SKIP_ADDING_NIXPKGS_CHANNEL}"
 
 get_macos_flags(){
   local major minor patch
+  # shellcheck disable=SC2034,SC2162
   IFS='.' read major minor patch < <(sw_vers -productVersion)
   # macos versions:
   # - 11.0+
@@ -51,7 +53,8 @@ get_flags(){
 install_log="$(mktemp)"
 
 try_install(){
-  if ! echo not a tty :o | sh /tmp/nix-install $(get_flags) &> $install_log; then
+  # shellcheck disable=SC2046
+  if ! echo not a tty :o | sh /tmp/nix-install $(get_flags) | tee "$install_log"; then
     # install failed, let's clean up so we can re-try
     # it'd be great if Nix wrote a contextual uninstall script to a reliable location?
     sudo mv /etc/bashrc.backup-before-nix /etc/bashrc
@@ -63,9 +66,9 @@ try_install(){
     # at the end. In our case, we're intentionally sourcing the script so that we can modify the environment. As far as I can tell, the ::add-path:: idiom in GH actions is a hack
     # around not being able to change the environment? But this difference has some
     # impact on whether the code can be shared at some point.
+    # shellcheck disable=SC1091
     source "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
   fi
-  cat "$install_log"
 }
 
 # we're looking for a side-effect from an EOF failure. We can't just directly
@@ -107,7 +110,7 @@ try_install || try_install || try_install || try_install || try_install
 
 # If the same issue strikes in just the right place, the install will return 0
 # but we won't have a channel...
-fixup_channel < $install_log
+fixup_channel < "$install_log"
 
 if [[ $TRAVIS_OS_NAME = 'osx' ]]; then
   # TODO: note that below is probably only helpful pre-catalina;
@@ -129,9 +132,10 @@ if [[ $INPUT_NIX_PATH != "" ]]; then
 fi
 
 extract_nix_version(){
-  echo $3
+  echo "$3"
 }
 get_nix_version(){
+  # shellcheck disable=SC2046
   extract_nix_version $(nix --version)
 }
 get_nixpkgs_version_info(){
@@ -147,5 +151,5 @@ get_nix_version_info(){
 
 travis_fold end nix.install
 travis_fold start nix.info
-printf "\e[34;1mNix $(get_nix_version_info) via github.com/nix-community/nix-travis-ci\e[0m\n"
+printf "\e[34;1mNix %s via github.com/nix-community/nix-travis-ci\e[0m\n" "$(get_nix_version_info)"
 travis_fold end nix.info

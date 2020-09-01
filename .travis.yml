@@ -13,7 +13,7 @@ jobs:
       stage: lint
       os: linux
       script: shellcheck install.sh
-      install: true
+      install: echo "Skipping install; Travis-CI includes shellcheck."
     - os: linux
       stage: os/version tests
       dist: xenial
