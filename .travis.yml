@@ -9,7 +9,13 @@ _cachix_push: &cachix_push
 jobs:
   include:
     # test the default install across many OS/versions
+    - name: shellcheck
+      stage: lint
+      os: linux
+      script: shellcheck install.sh
+      install: true
     - os: linux
+      stage: os/version tests
       dist: xenial
     - os: linux
       dist: bionic
@@ -27,6 +33,7 @@ jobs:
     # test specific features (but less broadly/specifically)
     # going with Linux only because it's faster...
     - name: use cachix
+      stage: feature tests
       os: linux
       env:
         - CACHIX_CACHE: nix-travis-ci
