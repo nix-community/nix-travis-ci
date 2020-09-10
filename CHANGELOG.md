@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [v5] - September 10, 2020
+
+Fix (hopefully) install failures on macOS which spontaneously started 
+occurring sometime in the past couple days.
+
 ## [v4] - September 1, 2020
 
 Fixed problem with (currently undocumented) auto-install of cachix (if
@@ -20,7 +25,8 @@ Added a `use_nix` alias for merging with specific jobs.
 
 Initial release.
 
-[unreleased]: https://github.com/nix-community/nix-travis-ci/compare/v4...HEAD
+[unreleased]: https://github.com/nix-community/nix-travis-ci/compare/v5...HEAD
+[v4]: https://github.com/nix-community/nix-travis-ci/compare/v4...v5
 [v3]: https://github.com/nix-community/nix-travis-ci/compare/v3...v4
 [v3]: https://github.com/nix-community/nix-travis-ci/compare/v2...v3
 [v2]: https://github.com/nix-community/nix-travis-ci/compare/v1...v2

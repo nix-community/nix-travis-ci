@@ -30,6 +30,16 @@ jobs:
     - os: osx
       osx_image: xcode12
 
+    - os: linux
+      stage: curl smoketests
+      install:
+        - curl -Ls https://github.com/nix-community/nix-travis-ci/raw/$TRAVIS_COMMIT/install.sh > /tmp/bootstrap_nix
+        - source /tmp/bootstrap_nix
+    - os: osx
+      install:
+        - curl -Ls https://github.com/nix-community/nix-travis-ci/raw/$TRAVIS_COMMIT/install.sh > /tmp/bootstrap_nix
+        - source /tmp/bootstrap_nix
+
     # test specific features (but less broadly/specifically)
     # going with Linux only because it's faster...
     - name: use cachix
