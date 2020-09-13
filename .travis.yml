@@ -1,6 +1,8 @@
 language: shell
 install: source install.sh
-script: nix run nixpkgs.cowsay -c cowsay wooo?
+script: nix-shell -p cowsay --command "cowsay wooo?"
+# Bare "nix" command hidden behind a flag in unstable
+# script: nix run nixpkgs.cowsay -c cowsay wooo?
 
 _cachix_push: &cachix_push
   after_success:
@@ -56,9 +58,9 @@ jobs:
         - SKIP_ADDING_NIXPKGS_CHANNEL: true
       script:
         # fail w/o nixpkgs
-        - nix run nixpkgs.cowsay -c cowsay wooo? && exit 1 || echo "Failed as expected"
+        - nix-shell -p cowsay --command "cowsay wooo?" && exit 1 || echo "Failed as expected"
         # succeed w/ nixpkgs
-        - NIX_PATH=nixpkgs=https://github.com/NixOS/nixpkgs/tarball/ab5863afada3c1b50fc43bf774b75ea71b287cde nix run nixpkgs.cowsay -c cowsay Succeeded as expected
+        - NIX_PATH=nixpkgs=https://github.com/NixOS/nixpkgs/tarball/ab5863afada3c1b50fc43bf774b75ea71b287cde nix-shell -p cowsay --command "cowsay Succeeded as expected"
 
     - name: set nixpkgs channel via NIX_PATH
       os: linux
