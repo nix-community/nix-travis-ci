@@ -140,10 +140,11 @@ get_nix_version(){
 }
 get_nixpkgs_version_info(){
   if [[ $INPUT_SKIP_ADDING_NIXPKGS_CHANNEL != "true" ]]; then
-    if ! nix-instantiate --eval -E 'with import <nixpkgs> {}; lib.version or lib.nixpkgsVersion'; then
-      echo "not in NIX_PATH"
+    if nix-instantiate --eval -E 'with import <nixpkgs> {}; lib.version or lib.nixpkgsVersion'; then
+      return 0
     fi
   fi
+  echo "not in NIX_PATH"
 }
 get_nix_version_info(){
   printf "%s" "$(get_nix_version) (nixpkgs: $(get_nixpkgs_version_info))"
