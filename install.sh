@@ -3,7 +3,7 @@
 # shellcheck shell=bash
 set -eo pipefail
 
-travis_fold end install
+travis_fold end install.2
 travis_fold start nix.install
 printf "\e[34;1mInstalling Nix so you can be a cool kid :]\e[0m\n" # labels the log fold line
 
