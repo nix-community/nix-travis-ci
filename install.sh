@@ -17,7 +17,7 @@ printf "\e[34;1mInstalling Nix so you can be a cool kid :]\e[0m\n" # labels the 
 # without this prefix.
 INPUT_NIX_TYPE="${NIX_TYPE-daemon}"
 INPUT_EXTRA_NIX_CONFIG="${EXTRA_NIX_CONFIG}"
-INPUT_NIX_URL="${NIX_URL:-https://files.t-ravis.com/install-allowed16}"
+INPUT_NIX_URL="${NIX_URL:-https://files.t-ravis.com/install-allowed17}"
 INPUT_NIX_PATH="${NIX_PATH}"
 INPUT_SKIP_ADDING_NIXPKGS_CHANNEL="${SKIP_ADDING_NIXPKGS_CHANNEL}"
 
