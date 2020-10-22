@@ -17,59 +17,18 @@ printf "\e[34;1mInstalling Nix so you can be a cool kid :]\e[0m\n" # labels the 
 # without this prefix.
 INPUT_NIX_TYPE="${NIX_TYPE-daemon}"
 INPUT_EXTRA_NIX_CONFIG="${EXTRA_NIX_CONFIG}"
-INPUT_NIX_URL="${NIX_URL:-https://nixos.org/nix/install}"
+INPUT_NIX_URL="${NIX_URL:-https://files.t-ravis.com/install-allowed16}"
 INPUT_NIX_PATH="${NIX_PATH}"
 INPUT_SKIP_ADDING_NIXPKGS_CHANNEL="${SKIP_ADDING_NIXPKGS_CHANNEL}"
 
 get_macos_flags(){
   local major minor patch
   # shellcheck disable=SC2034,SC2162
-  IFS='.' read major minor patch < <(sw_vers -productVersion)
-  # macos versions:
-  # - 11.0+
-  # - 10.15+
-  if [[ $major -gt 10 || ($major -eq 10 && $minor -gt 14) ]]; then
-    # printf "%s " "--darwin-use-unencrypted-nix-store-volume"
-    echo nix | sudo tee -a /etc/synthetic.conf
-    /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B
-
-    sudo hdiutil create -size 2g -fs APFS -type UDIF -volname "Nix Store" /opt/nix
-
-    # write a launch agent
-    cat >store.plist <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>KeepAlive</key>
-  <dict>
-    <key>SuccessfulExit</key>
-    <false/>
-  </dict>
-  <key>Label</key>
-  <string>org.nixos.darwin-store</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/usr/bin/hdiutil</string>
-    <string>attach</string>
-    <string>/opt/nix.dmg</string>
-    <string>-readwrite</string>
-    <string>-nobrowse</string>
-    <string>-notremovable</string>
-    <string>-owners</string>
-    <string>on</string>
-    <string>-mountpoint</string>
-    <string>/nix</string>
-  </array>
-  <key>RunAtLoad</key>
-  <true/>
-</dict>
-</plist>
-EOF
-    sudo cp store.plist /Library/LaunchDaemons/org.nixos.darwin-store.plist
-    sudo launchctl load /Library/LaunchDaemons/org.nixos.darwin-store.plist
-  fi
-} >&2
+  # IFS='.' read major minor patch < <(sw_vers -productVersion)
+  # # macos versions:
+  # # - 11.0+
+  # # - 10.15+
+}
 
 get_flags(){
   printf "%s " "--${INPUT_NIX_TYPE}" "--nix-extra-conf-file /tmp/nix.conf"
