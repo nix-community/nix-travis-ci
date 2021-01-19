@@ -1,6 +1,9 @@
 # nix-travis-ci
 Bootstrap Nix support on Travis CI (a humble near-drop-in replacement for `language: nix`)
 
+> **Status:**
+> I put a few weeks of work into this project because I felt bad about the prospect of Nix projects being stuck with the rotting `language:nix` support on travis-ci, and wanted to give them an exit-path (I reached this goal months ago). I also intended to roughly track changes in `install-nix-action`, so that it'd be easier to people to move between them. However, after Travis-CI's pricing update, I feel like I've mostly wasted this work. For the time being, I'm happy to keep up with PRs--but I'm not sure I'll do any new feature work myself here.
+
 # Quickstart
 
 If all of the jobs you're running use Nix, these two lines are usually enough to add Nix support to your `.travis.yml` (they replace `language: nix` if it's already in your config):
